@@ -1,0 +1,12 @@
+{
+    "name": "myproject",
+    "metadatas": {
+        "public": false
+    },
+    "members" [
+        developer@mycompany.com
+    ],
+    "admins": [
+        sysadmin@mycompany.com
+    ]
+}

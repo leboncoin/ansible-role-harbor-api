@@ -1,0 +1,6 @@
+
+harbor_directory_api: "{{ role_path }}/files/config/"
+harbor_directory_api_projects: "{{ role_path }}/files/config/projects/"
+
+harbor_auth_mode: db_auth
+harbor_harbor_admin_password: Harbor12345

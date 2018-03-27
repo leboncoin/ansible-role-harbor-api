@@ -1,0 +1,52 @@
+---
+- set_fact:
+    project: "{{ project_file| from_json }}"
+
+- name: Check if project exist
+  uri:
+    url: "{{ 'http://' ~ inventory_hostname ~ '/api/projects?project_name=' ~ project.name }}"
+    method: "HEAD"
+    user: "admin"
+    password: "{{ harbor_harbor_admin_password }}"
+    force_basic_auth: yes
+    status_code: 200, 404
+  delegate_to: localhost
+  register: project_exist
+
+- name: Create new project
+  uri:
+    url: "{{ 'http://' ~ inventory_hostname ~ '/api/projects' }}"
+    method: "POST"
+    body_format: json
+    body: >
+      {
+        "project_name": "{{ project.name }}"
+      }
+    user: "admin"
+    password: "{{ harbor_harbor_admin_password }}"
+    force_basic_auth: yes
+    status_code: 201
+  delegate_to: localhost
+  when: project_exist.status == 404
+
+- name: Retrieve project id
+  uri:
+    url: "{{ 'http://' ~ inventory_hostname ~ '/api/projects' }}"
+    method: "GET"
+    user: "admin"
+    password: "{{ harbor_harbor_admin_password }}"
+    force_basic_auth: yes
+    status_code: 200
+  delegate_to: localhost
+  register: project_list
+
+- set_fact:
+    project_id: >-
+                {{ project_list.json 
+                  | selectattr('name', 'equalto', project.name ) 
+                  | map(attribute='project_id')
+                  | first
+                }}
+
+- include: metadatas.yml
+- include: members.yml

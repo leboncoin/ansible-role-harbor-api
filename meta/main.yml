@@ -1,0 +1,28 @@
+---
+galaxy_info:
+  author: Andy LADJADJ
+  description: Manage Vmware Harbor API.
+  company: leboncoin
+  license: MIT
+  min_ansible_version: 2.3
+  platforms:
+  - name: Fedora
+    versions:
+    - all
+  - name: Amazon
+    versions:
+    - all
+  - name: Ubuntu
+    versions:
+    - all
+  - name: Debian
+    versions:
+    - all
+  galaxy_tags:
+  - leboncoin
+  - vmware
+  - harbor
+  - api
+  - web
+dependencies: []
+allow_duplicates: yes

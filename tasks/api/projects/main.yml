@@ -1,0 +1,12 @@
+---
+- find:
+    path: "{{ harbor_directory_api_projects }}"
+    file_type: file
+    recurse: yes
+  delegate_to: localhost
+  register: harbor_projects_files
+
+- include: project.yml
+  with_file: "{{ harbor_projects_files.files | map(attribute='path') | list }}"
+  loop_control:
+    loop_var: project_file

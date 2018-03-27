@@ -1,0 +1,16 @@
+---
+- name: Update metadatas
+  uri:
+    url: "{{ 'http://' ~ inventory_hostname ~ '/api/projects/' ~ project_id ~ '/metadatas/public' }}"
+    method: "PUT"
+    body_format: json
+    body: >
+      {
+        "public": "{{ project.metadatas.public }}"
+      }
+    user: "admin"
+    password: "{{ harbor_harbor_admin_password }}"
+    force_basic_auth: yes
+    status_code: 200
+  delegate_to: localhost
+      

@@ -1,0 +1,39 @@
+---
+- set_fact:
+    roles: "{{ lookup('file', harbor_directory_api ~ 'roles.json') }}"
+
+- name: Retrieve user ids
+  uri:
+    url: "{{ 'http://' ~ inventory_hostname ~ '/api/users?username=' ~  item }}"
+    method: "GET"
+    body_format: json
+    user: "admin"
+    password: "{{ harbor_harbor_admin_password }}"
+    force_basic_auth: yes
+    status_code: 200
+  with_items: 
+    - "{{ roles.admins }}"
+    - "{{ roles.admins_removed  }}"
+  delegate_to: localhost
+  register: registry_users
+
+- name: Update members
+  uri:
+    url: "{{ 'http://' ~ inventory_hostname ~ '/api/users/' ~ item.user_id ~ '/sysadmin' }}"
+    method: "PUT"
+    body_format: json
+    body: >
+      {
+        "has_admin_role": {{ 1 if item.username in roles.admins else 0 }}
+      }
+    user: "admin"
+    password: "{{ harbor_harbor_admin_password }}"
+    force_basic_auth: yes
+    status_code: 200, 409
+  delegate_to: localhost
+  with_items: >-
+            {{ 
+              registry_users.results 
+              | map(attribute='json') 
+              | list 
+            }}

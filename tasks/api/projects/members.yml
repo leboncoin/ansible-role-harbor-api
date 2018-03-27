@@ -1,0 +1,63 @@
+---
+- set_fact:
+    developers: "{{ project.developers | default([]) }}"
+    admins: "{{ project.admins | default([]) }}"
+- set_fact:
+    members: "{{ developers + admins }}"
+
+- name: Ensure user exist
+  uri:
+    url: "{{ 'http://' ~ inventory_hostname ~ '/api/ldap/users/import' }}"
+    method: "POST"
+    body_format: json
+    body: >
+      {
+        "ldap_uid_list": {{ members }}
+      }
+    user: "admin"
+    password: "{{ harbor_harbor_admin_password }}"
+    force_basic_auth: yes
+    status_code: 200, 500
+
+- name: Retrieve members
+  uri:
+    url: "{{ 'http://' ~ inventory_hostname ~ '/api/projects/' ~ project_id ~ '/members' }}"
+    method: "GET"
+    user: "admin"
+    password: "{{ harbor_harbor_admin_password }}"
+    force_basic_auth: yes
+    status_code: 200
+  delegate_to: localhost
+  register: project_members
+
+- name: Update members
+  uri:
+    url: "{{ 'http://' ~ inventory_hostname ~ '/api/projects/' ~ project_id ~ '/members' }}"
+    method: "POST"
+    body_format: json
+    body: >
+      {
+        "roles": [
+          {{ 1 if item in admins else 2 }} # Admin or Developer
+        ],
+        "username": "{{ item }}"
+      }
+    user: "admin"
+    password: "{{ harbor_harbor_admin_password }}"
+    force_basic_auth: yes
+    status_code: 200, 409
+  delegate_to: localhost
+  with_items: "{{ members }}"
+
+- name: Remove members
+  uri:
+    url: "{{ 'http://' ~ inventory_hostname ~ '/api/projects/' ~ project_id ~ '/members/' ~ item.user_id }}"
+    method: "DELETE"
+    user: "admin"
+    password: "{{ harbor_harbor_admin_password }}"
+    force_basic_auth: yes
+    status_code: 200
+  delegate_to: localhost
+  when: item.username not in members
+  with_items: "{{ project_members.json }}"
+      

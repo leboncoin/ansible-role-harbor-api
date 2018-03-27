@@ -1,0 +1,8 @@
+{
+    "admins":[
+        "sysadmin@mycompany.com"
+    ],
+    "admins_removed":[
+        "oldsysadmin@mycompany.com"
+    ]
+}
