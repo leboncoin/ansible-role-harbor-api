@@ -23,6 +23,14 @@ An Ansible Role to manage Harbor API
 
 Have one or more [Harbor](https://github.com/vmware/harbor) instances
 
+# Installation
+
+Harbor-API  is an Ansible role distributed globally using [Ansible Galaxy](https://galaxy.ansible.com/). In order to install Harbor-API role you can use the following command.
+
+```
+$ ansible-galaxy install leboncoin.harbor-api
+```
+
 # Role Variables
 
 Available variables are listed below, along with default values (see defaults/main.yml):
@@ -90,8 +98,8 @@ Including an example of how to use your role (for instance, with variables passe
 
     - hosts: harbor
       roles:
-         - { role: lbc.harbor } # install harbor instance
-         - { role: lbc.harbor-api } # populate api
+         - { role: leboncoin.harbor } # install harbor instance
+         - { role: leboncoin.harbor-api } # populate api
 
 # Contributing
 
